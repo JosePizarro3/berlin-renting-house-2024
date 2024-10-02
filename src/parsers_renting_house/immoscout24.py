@@ -1,9 +1,9 @@
 import os
 
+from parse_immoscout.utils import extract_data
 from pypdf import PdfReader
 
-from parse_immoscout.datamodel import ImmoScoutHouse
-from parse_immoscout.utils import extract_data
+from parsers_renting_house.datamodel import ImmoScoutHouse
 
 # Filepath definitions
 dirname = os.path.dirname(os.path.abspath(__name__))  # dirname of the project locally
