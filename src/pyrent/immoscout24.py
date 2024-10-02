@@ -36,11 +36,32 @@ immoscout_house.address = address
 # ! `r'Wohnfläche'` in the regex does not work (probably due to a problem with PDFReader)
 sqm = extract_data_comma(text=full_text, pattern=r'äche *ca\.\:\s*([\d\,]+)\s*m')
 immoscout_house.square_meter = sqm
+# Construction year
+construction_year = extract_data(
+    text=full_text, pattern=r'Baujahr[\s\:]*(\d+)', type=int
+)
+immoscout_house.construction_year = construction_year
 
 ## Price
 price = Price()
+immoscout_house.price = price
 # Kaltmiete
 total_cold = extract_data_comma(text=full_text, pattern=r'Kaltmiete\:\s*([\d\,]+)\s*\€')
+extras = extract_data_comma(
+    text=full_text, pattern=r'Nebenkosten\:[\s\+]*([\d\,]+)\s*\€'
+)
+heating = extract_data_comma(
+    text=full_text, pattern=r'Heizkosten\:[\s\+]*([\d\,]+)\s*\€'
+)
+total_warm = total_cold + extras + heating
+deposit = extract_data_comma(
+    text=full_text, pattern=r'Kaution o\.\nGenossenschafts anteile\s*\:\s*([\d\.]+)'
+)
+price.total_cold = total_cold
+price.extras = extras
+price.heating = heating
+price.total_warm = total_warm
+price.deposit = deposit
 
 
 # Print the model as JSON
