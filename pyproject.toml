@@ -12,8 +12,8 @@ classifiers = [
     "Programming Language :: Python :: 3.11",
     "Programming Language :: Python :: 3.12",
 ]
-name = "parsers_renting_house"
-description = "A package to parse PDF information from different sources (e.g., ImmoScout24) into a structured JSON."
+name = "pyrent"
+description = "A package to parse PDF information from different sources (e.g., ImmoScout24) into a structured JSON for data analysis."
 dynamic = ["version"]
 readme = "README.md"
 requires-python = ">=3.9"
@@ -30,9 +30,9 @@ dependencies = [
 ]
 
 [project.urls]
-"Homepage" = "https://github.com/JosePizarro3/parsers-renting-house"
-"Bug Tracker" = "https://github.com/JosePizarro3/parsers-renting-house/issues"
-"Documentation" = "https://JosePizarro3.github.io/parsers-renting-house/"
+"Homepage" = "https://github.com/JosePizarro3/pyrent"
+"Bug Tracker" = "https://github.com/JosePizarro3/pyrent/issues"
+"Documentation" = "https://JosePizarro3.github.io/pyrent/"
 
 [project.optional-dependencies]
 dev = [
