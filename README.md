@@ -1,4 +1,4 @@
-# berlin-renting-house-2024
+# parsers-renting-house
 
 I am trying to create a database with offers seen in ImmoScout24. As the website is pretty obscure (without API), I am determined to simply print the pdfs of offers and categorize them in terms of price per square meter.
 
