@@ -1,71 +1,53 @@
-import os
-
-from pypdf import PdfReader
-
 from pyrent.datamodel import ImmoScoutHouse, Price
-from pyrent.utils import extract_data, extract_data_comma
-
-# Filepath definitions
-dirname = os.path.dirname(os.path.abspath(__name__))  # dirname of the project locally
-data_file = os.path.join(
-    'data',
-    '6E-sqm',
-    'Einbauküche kann übernommen werden - Anmietung zum 01.11.2024 möglich.pdf',
-)  # path to file within the project
-file = os.path.join(dirname, data_file)  # full local path to file
-file_dirname = os.path.dirname(file)  # name of the subfolder where file is located
-file_basename = os.path.basename(file)  # name of the file
-
-# Reading PDF
-reader = PdfReader(file)
-full_text = ''
-for page in reader.pages:
-    full_text += f'{page.extract_text()} '
-immoscout_house = ImmoScoutHouse()
-
-## General metadata
-# Offer name
-immoscout_house.name = reader.metadata.title
-# Scout-ID extraction
-scout_id = extract_data(text=full_text, pattern=r'Scout\-ID\s*\:\s*(\d+)', type=int)
-immoscout_house.scout_id = scout_id
-# Address
-address = extract_data(text=full_text, pattern=r'Adresse\n([\w\,\s]+)Wohnung', type=str)
-immoscout_house.address = address
-# m2
-# ! `r'Wohnfläche'` in the regex does not work (probably due to a problem with PDFReader)
-sqm = extract_data_comma(text=full_text, pattern=r'äche *ca\.\:\s*([\d\,]+)\s*m')
-immoscout_house.square_meter = sqm
-# Construction year
-construction_year = extract_data(
-    text=full_text, pattern=r'Baujahr[\s\:]*(\d+)', type=int
-)
-immoscout_house.construction_year = construction_year
-
-## Price
-price = Price()
-immoscout_house.price = price
-# Kaltmiete
-total_cold = extract_data_comma(text=full_text, pattern=r'Kaltmiete\:\s*([\d\,]+)\s*\€')
-extras = extract_data_comma(
-    text=full_text, pattern=r'Nebenkosten\:[\s\+]*([\d\,]+)\s*\€'
-)
-heating = extract_data_comma(
-    text=full_text, pattern=r'Heizkosten\:[\s\+]*([\d\,]+)\s*\€'
-)
-total_warm = total_cold + extras + heating
-deposit = extract_data_comma(
-    text=full_text, pattern=r'Kaution o\.\nGenossenschafts anteile\s*\:\s*([\d\.]+)'
-)
-price.total_cold = total_cold
-price.extras = extras
-price.heating = heating
-price.total_warm = total_warm
-price.deposit = deposit
+from pyrent.parsing import PDFParser, Quantity
 
 
-# Print the model as JSON
-immoscout_house_json = immoscout_house.model_dump_json()
-output_json = os.path.join(file_dirname, file_basename.replace('.pdf', '.json'))
-with open(output_json, 'w') as f:
-    f.write(immoscout_house_json)
+class ImmoScout24PDFParser(PDFParser):
+    def _quantities(self) -> list[Quantity]:
+        return [
+            Quantity(name='name', pattern=r'\n(.*?)\n', type=str),
+            Quantity(name='scout_id', pattern=r'Scout\-ID\s*\:\s*(\d+)', type=int),
+            Quantity(name='address', pattern=r'Adresse\n([\w\,\s]+)Wohnung', type=str),
+            # ! adding `Wonhfläche` to the pattern is not working, probably due to an issue reading the PDF
+            Quantity(
+                name='square_meter', pattern=r'äche *ca\.\:\s*([\d\,]+)\s*m', type=float
+            ),
+            Quantity(
+                name='construction_year', pattern=r'Baujahr[\s\:]*(\d+)', type=int
+            ),
+            Quantity(
+                name='total_cold', pattern=r'Kaltmiete\:\s*([\d\,]+)\s*\€', type=float
+            ),
+            Quantity(
+                name='extras', pattern=r'Nebenkosten\:[\s\+]*([\d\,]+)\s*\€', type=float
+            ),
+            Quantity(
+                name='heating', pattern=r'Heizkosten\:[\s\+]*([\d\,]+)\s*\€', type=float
+            ),
+            Quantity(
+                name='deposit',
+                pattern=r'Kaution o\.\nGenossenschafts anteile\s*\:\s*([\d\.]+)',
+                type=float,
+            ),
+        ]
+
+
+class ImmoScout24Parser:
+    def parse(self, filepath: str):
+        pdf_parser = ImmoScout24PDFParser(mainfile=filepath)
+        data = pdf_parser.parsed_data()
+
+        immoscout_house = ImmoScoutHouse()
+        for key in ['name', 'scout_id', 'address', 'square_meter', 'construction_year']:
+            setattr(immoscout_house, key, data.get(key))
+
+        price = Price()
+        for key in ['total_cold', 'extras', 'heating', 'deposit']:
+            setattr(price, key, data.get(key))
+        try:
+            price.total_warm = price.total_cold + price.extras + price.heating
+        except ValueError:
+            pass
+        immoscout_house.price = price
+
+        return immoscout_house

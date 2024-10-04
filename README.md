@@ -8,3 +8,8 @@ If you want to contribute or have some questions, feel free to reach out:
 - Email: [jose.pizarro@physik.hu-berlin.de](mailto:jose.pizarro@physik.hu-berlin.de)
 - Twitter/X: [@JosePizarroB](https://x.com/JosePizarroB)
 - LinkedIn: [Jose Pizarro Blanco](https://www.linkedin.com/in/jose-pizarro-blanco-68931ab3/)
+
+
+## Webs for scrapping
+
+- [ImmoScout24](https://www.immobilienscout24.de/Suche/de/berlin/berlin/wohnung-mieten?haspromotion=false&exclusioncriteria=swapflat&pricetype=rentpermonth&sorting=2)

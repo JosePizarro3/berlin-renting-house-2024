@@ -27,6 +27,7 @@ license = { file = "LICENSE" }
 dependencies = [
     "pypdf",
     "pydantic",
+    "click",
 ]
 
 [project.urls]
@@ -42,6 +43,9 @@ dev = [
     "pytest-timeout",
     "pytest-cov",
 ]
+
+[project.scripts]
+pyrent = "pyrent.cli:cli"
 
 [tool.ruff]
 # Exclude a variety of commonly ignored directories.

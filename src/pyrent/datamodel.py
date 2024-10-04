@@ -26,7 +26,7 @@ class Price(BaseModel):
 
     deposit: Optional[float] = Field(None, title='Security deposit.')
 
-    parent: Optional['ImmoScoutHouse'] = None
+    # parent: Optional['ImmoScoutHouse'] = None
 
 
 class ImmoScoutHouse(BaseModel):
@@ -41,6 +41,8 @@ class ImmoScoutHouse(BaseModel):
 
     address: Optional[str] = Field(None, title='Address of the house.')
 
+    zip_code: Optional[str] = Field(None, title='Zip code of the house.')
+
     construction_year: Optional[int] = Field(
         None, title='Year of construction of the house.'
     )
@@ -53,6 +55,6 @@ class ImmoScoutHouse(BaseModel):
 
     def __setattr__(self, name, value):
         # If the 'price' attribute is being set or modified, update the parent reference
-        if name == 'price' and isinstance(value, Price):
-            value.parent = self
+        # if name == 'price' and isinstance(value, Price):
+        #     value.parent = self
         super().__setattr__(name, value)
