@@ -8,6 +8,11 @@ class ImmoScout24PDFParser(PDFParser):
             Quantity(name='name', pattern=r'\n(.*?)\n', type=str),
             Quantity(name='scout_id', pattern=r'Scout\-ID\s*\:\s*(\d+)', type=int),
             Quantity(name='address', pattern=r'Adresse\n([\w\,\s]+)Wohnung', type=str),
+            Quantity(
+                name='zip_code',
+                pattern=r'Adresse\n[a-zA-ZäöüÄÜÖ\,\s]*(\d+)[a-zA-Z\,\s]*Wohnung',
+                type=str,
+            ),
             # ! adding `Wonhfläche` to the pattern is not working, probably due to an issue reading the PDF
             Quantity(
                 name='square_meter', pattern=r'äche *ca\.\:\s*([\d\,]+)\s*m', type=float
@@ -38,7 +43,14 @@ class ImmoScout24Parser:
         data = pdf_parser.parsed_data()
 
         immoscout_house = ImmoScoutHouse()
-        for key in ['name', 'scout_id', 'address', 'square_meter', 'construction_year']:
+        for key in [
+            'name',
+            'scout_id',
+            'address',
+            'zip_code',
+            'square_meter',
+            'construction_year',
+        ]:
             setattr(immoscout_house, key, data.get(key))
 
         price = Price()
