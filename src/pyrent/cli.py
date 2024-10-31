@@ -18,8 +18,10 @@ def get_name_string(json_data: dict) -> str:
     """
     zip_code = json_data.get('zip_code', '00000')
     construction_year = json_data.get('construction_year', '0000')
-    total_cold = int(json_data.get('price', {}).get('total_cold', 0))
-    square_meter = int(json_data.get('square_meter', 0))
+    if json_data.get('price', {}).get('total_cold', 0):
+        total_cold = int(json_data.get('price', {}).get('total_cold', 0))
+    if json_data.get('square_meter', 0):
+        square_meter = int(json_data.get('square_meter', 0))
     scout_id = json_data.get('scout_id', 0)
     return f'{scout_id}_{zip_code}_{construction_year}_{total_cold}EUR_{square_meter}m2'
 

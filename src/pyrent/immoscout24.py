@@ -1,3 +1,5 @@
+import re
+
 from pyrent.datamodel import ImmoScoutHouse, Price
 from pyrent.parsing import PDFParser, Quantity
 
@@ -36,6 +38,25 @@ class ImmoScout24PDFParser(PDFParser):
             ),
         ]
 
+    def _owner_match(self, key: str = '') -> bool:
+        match = re.search(key, self.full_text, re.DOTALL)
+        if match:
+            return True
+        return False
+
+    def owner(self) -> str:
+        # TODO keep extending this with more cases
+        if self._owner_match(key=r'HOWOGE'):
+            return 'HOWOGE'
+        elif self._owner_match(key=r'Vonovia'):
+            return 'Vonovia'
+        elif self._owner_match(key=r'degewo'):
+            return 'degewo'
+        # `private` owners do not appear in the text, so it is the default
+        elif not self._owner_match(key=r'Gewerbliche\:r Anbieter\:in'):
+            return 'private'
+        return 'unknown'
+
 
 class ImmoScout24Parser:
     def parse(self, filepath: str):
@@ -58,7 +79,7 @@ class ImmoScout24Parser:
             setattr(price, key, data.get(key))
         try:
             price.total_warm = price.total_cold + price.extras + price.heating
-        except ValueError:
+        except TypeError:
             pass
         immoscout_house.price = price
 

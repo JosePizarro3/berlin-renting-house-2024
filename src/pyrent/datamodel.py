@@ -9,7 +9,7 @@ class Price(BaseModel):
     prices are given in the units specified in `currency_units`.
     """
 
-    currency_units: Optional[str] = Field(
+    currency_units: str = Field(
         'EUR', title='Currency units used in the prices. Default is EUR.'
     )
 
@@ -35,7 +35,7 @@ class ImmoScoutHouse(BaseModel):
     is extracted from the PDF generated when printing the web of the offer.
     """
 
-    name: Optional[str] = Field('Unknown', title='Name of the offer as published.')
+    name: str = Field('Unknown', title='Name of the offer as published.')
 
     scout_id: Optional[int] = Field(None, title='ImmoScout24 ID.')
 
@@ -52,6 +52,11 @@ class ImmoScoutHouse(BaseModel):
     )
 
     price: Optional[Price] = Field(None, title='The different prices of the house.')
+
+    owner: Optional[str] = Field(
+        'unknown',
+        title='Owner of the house. It can be a private entity or some specific company (e.g., HOWOGE, Vonovia, etc.).',
+    )
 
     def __setattr__(self, name, value):
         # If the 'price' attribute is being set or modified, update the parent reference
